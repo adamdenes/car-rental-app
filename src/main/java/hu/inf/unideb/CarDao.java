@@ -26,6 +26,9 @@ public interface CarDao {
     )
     void createTable();
 
+    @SqlUpdate("DROP TABLE carpool;")
+    void dropTable();
+
     @SqlQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='carpool'")
     boolean checkTableExists();
 
