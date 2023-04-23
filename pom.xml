@@ -13,6 +13,7 @@
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>20</javafx.version>
+        <jdbi.version>3.37.1</jdbi.version>
     </properties>
 
     <dependencies>
@@ -60,10 +61,18 @@
             <version>1.18.26</version>
             <scope>compile</scope>
         </dependency>
+        <!-- JDBI -->
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
-            <version>2.2</version>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-core</artifactId>
+            <version>${jdbi.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-sqlobject</artifactId>
+            <version>${jdbi.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

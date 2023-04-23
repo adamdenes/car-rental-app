@@ -1,74 +1,45 @@
 package hu.inf.unideb;
 
+
 import model.Car;
-import model.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-public class CarDao {
-    public void addCar(Car car) {
-        Transaction transaction = null;
+import java.time.LocalDate;
+import java.util.Optional;
 
-        try (Session session = HibernateUtil.getSession()) {
-            transaction = session.beginTransaction();
-            session.persist(car);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+@RegisterBeanMapper(Car.class)
+public interface CarDao {
+    @SqlUpdate("""
+            CREATE TABLE carpool (
+                "plate" VARCHAR PRIMARY KEY,
+                "make" VARCHAR NOT NULL,
+                "model" VARCHAR NOT NULL,
+                year INTEGER NOT NULL,
+                "rental_start" TEXT,
+                "state" VARCHAR NOT NULL
+            )
+            """
+    )
+    void createTable();
 
-    public void updateCar(Car car) {
-        Transaction transaction = null;
+    @SqlQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='carpool'")
+    boolean checkTableExists();
 
-        try (Session session = HibernateUtil.getSession()) {
-            transaction = session.beginTransaction();
-            session.merge(car);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+    @SqlUpdate("INSERT INTO carpool VALUES (:plate, :make, :model, :year, :rentalStartDate, :state)")
+    void insertCar(@Bind("plate") String plate,
+                   @Bind("make") String make,
+                   @Bind("model") String model,
+                   @Bind("year") int year,
+                   @Bind("rentalStartDate") LocalDate rentalStartDate,
+                   @Bind("state") Car.State state);
 
-    public void deleteCar(Car car) {
-        Transaction transaction = null;
+    @SqlUpdate("INSERT INTO carpool VALUES (:plate, :make, :model, :year, :rentalStartDate, :state)")
+    void insertCar(@BindBean Car car);
 
-        try (Session session = HibernateUtil.getSession()) {
-            transaction = session.beginTransaction();
-            session.remove(car);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
-
-    public Car getCarById(Long id) {
-        Session session = HibernateUtil.getSession();
-        Transaction transaction = null;
-        Car car = null;
-
-        try {
-            transaction = session.beginTransaction();
-            car = session.get(Car.class, id);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-
-        return car;
-    }
+    @SqlQuery("SELECT * FROM carpool WHERE plate = :plate")
+    Optional<Car> getCarByPlate(@Bind("plate") String plate);
 }
