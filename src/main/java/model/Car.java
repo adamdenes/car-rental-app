@@ -25,8 +25,8 @@ public class Car {
     private String model;
     @Column(nullable = false, name = "year")
     private int year;
-    @Column(nullable = false,  name = "rental start")
+    @Column(name = "rental_start")
     private LocalDate rentalStartDate;
-    @Column(nullable = false,  name = "rental end")
-    private LocalDate rentalEndDate;
+    @Column(nullable = false, name = "state")
+    private String state;
 }
