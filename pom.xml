@@ -42,9 +42,9 @@
             <version>${javafx.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- JPA hibernate/sqlite-->
+        <!-- hibernate/sqlite-->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.1.7.Final</version>
         </dependency>
