@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @RegisterBeanMapper(Car.class)
@@ -19,7 +20,7 @@ public interface CarDao {
                 "make" VARCHAR NOT NULL,
                 "model" VARCHAR NOT NULL,
                 year INTEGER NOT NULL,
-                "rental_start" TEXT,
+                "rentalStartDate" INTEGER,
                 "state" VARCHAR NOT NULL
             )
             """
@@ -45,4 +46,18 @@ public interface CarDao {
 
     @SqlQuery("SELECT * FROM carpool WHERE plate = :plate")
     Optional<Car> getCarByPlate(@Bind("plate") String plate);
+
+    @SqlQuery("SELECT * FROM carpool ORDER BY plate")
+    List<Car> getCars();
+
+    @SqlUpdate("DELETE FROM carpool")
+    void deleteAllCars();
+
+    @SqlUpdate("DELETE FROM carpool WHERE plate = :plate")
+    int deleteCarByPlate(@Bind("plate") String plate);
+
+
+    @SqlUpdate("UPDATE carpool SET make = :make, model = :model, year = :year, " +
+            "rentalStartDate = :rentalStartDate, state = :state WHERE plate = :plate")
+    void updateCar(@BindBean Car car);
 }
