@@ -1,5 +1,6 @@
 package hu.inf.unideb;
 
+import javafx.application.Application;
 import model.Car;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -12,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         // SQL will be called from CarRentalApp FX class
-        var jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
+        /*var jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
         jdbi.installPlugin(new SqlObjectPlugin());
 
         try (var handle = jdbi.open()) {
@@ -31,7 +32,9 @@ public class Main {
             cd.insertCar(new Car("GHI789", "Toyota", "Highlander", 2019, null, Car.State.AVAILABLE));
             cd.insertCar(new Car("JKL101", "Toyota", "Camry", 2023, null, Car.State.AVAILABLE));
             cd.insertCar(new Car("MNO110", "Toyota", "C-HR", 2022, LocalDate.now(), Car.State.RENTED));
-        }
+        }*/
+
+        Application.launch(SceneSwitchingApplication.class, args);
     }
 
 }
