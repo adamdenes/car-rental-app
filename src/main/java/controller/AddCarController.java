@@ -2,16 +2,23 @@ package controller;
 
 import hu.inf.unideb.CarDao;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Car;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 public class AddCarController {
@@ -36,11 +43,8 @@ public class AddCarController {
     @FXML
     private RadioButton availableRadioButton;
 
-    private static final String dbPath = "/home/adenes/projects/java/car-rental-app/carpool.db";
-    private static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
-
     @FXML
-    private void addCar() {
+    private void handleSaveButton() throws IOException {
         String plate = plateField.getText();
         String make = makeField.getText();
         String model = modelField.getText();
@@ -49,7 +53,6 @@ public class AddCarController {
         Car.State state = availableRadioButton.isSelected() ? Car.State.AVAILABLE : Car.State.RENTED;
 
         Car car = new Car(plate, make, model, year, rentalStartDate, state);
-        AddCarController.jdbi.installPlugin(new SqlObjectPlugin());
 
         if (isRented(car)) {
             car.setState(Car.State.RENTED);
@@ -57,9 +60,8 @@ public class AddCarController {
             car.setState(Car.State.AVAILABLE);
         }
 
-        try (var handle = jdbi.open()) {
-            var cd = handle.attach(CarDao.class);
-
+        CarRentalController.jdbi.useHandle(handle -> {
+            CarDao cd = handle.attach(CarDao.class);
             Optional<Car> exists = cd.getCarByPlate(car.getPlate());
             if (exists.isEmpty()) {
                 // create a new car record
@@ -74,12 +76,13 @@ public class AddCarController {
 
                 cd.updateCar(exists.get());
             }
+        });
 
-            Stage stage = (Stage) saveButton.getScene().getWindow();
-            stage.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // switch back to `carrental` scene
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/carrental.fxml")));
+        Stage stage = (Stage) saveButton.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     private boolean isRented(Car car) {

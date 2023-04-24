@@ -1,16 +1,28 @@
 package controller;
 
 import hu.inf.unideb.CarDao;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import model.Car;
 import model.Car.State;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 public class CarRentalController {
     @FXML
@@ -35,24 +47,12 @@ public class CarRentalController {
     private TableColumn<Car, State> stateColumn;
 
     @FXML
-    private TextField plateTextField;
-
-    @FXML
-    private TextField makeTextField;
-
-    @FXML
-    private TextField modelTextField;
-
-    @FXML
-    private TextField yearTextField;
-
-    @FXML
-    private DatePicker rentalStartDatePicker;
-
-    @FXML
     private Button addButton;
 
-    public static final String dbPath = "/home/adenes/projects/java/car-rental-app/carpool.db";
+    @FXML
+    private TextField plateDeleteField;
+    private static final String dbPath = "/home/adenes/projects/java/car-rental-app/carpool.db";
+    public static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
 
     @FXML
     private void initialize() {
@@ -63,44 +63,45 @@ public class CarRentalController {
         rentalStartDateColumn.setCellValueFactory(new PropertyValueFactory<>("rentalStartDate"));
         stateColumn.setCellValueFactory(new PropertyValueFactory<>("state"));
 
-        var jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
-        jdbi.installPlugin(new SqlObjectPlugin());
+        CarRentalController.jdbi.installPlugin(new SqlObjectPlugin());
 
-        try (var handle = jdbi.open()) {
-            var cd = handle.attach(CarDao.class);
-            List<Car> cars = cd.getCars();
+        jdbi.useHandle(handle -> {
+            List<Car> cars = handle.attach(CarDao.class).getCars();
             carTable.getItems().addAll(cars);
-        } catch (Exception e) {
-            e.printStackTrace();
+        });
+    }
+
+
+    @FXML
+    private void handleAddButton(ActionEvent actionEvent) throws IOException {
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/addcar.fxml")));
+        stage.setScene(new Scene(root));
+        stage.setTitle("Add Car");
+        // can't close parent
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+    }
+
+    @FXML
+    public void handleDeleteButton(ActionEvent actionEvent) {
+        String plateToDelete = plateDeleteField.getText();
+        if (!plateToDelete.isEmpty()) {
+            jdbi.useHandle(handle -> {
+                handle.attach(CarDao.class).deleteCarByPlate(plateToDelete);
+            });
+            handleRefreshButton(actionEvent);
         }
     }
 
     @FXML
-    private void addCar() {
-//        try {
-//            String plate = plateField.getText();
-//            String make = makeField.getText();
-//            String model = modelField.getText();
-//            int year = Integer.parseInt(yearField.getText());
-//            LocalDate rentalStartDate = rentalStartDatePicker.getValue();
-//            Car.State state = availableRadioButton.isSelected() ? Car.State.AVAILABLE : Car.State.RENTED;
-//
-//            Car car = new Car(plate, make, model, year, rentalStartDate, state);
-//            carDao.insert(car);
-//
-//            refreshCarList();
-//        } catch (NumberFormatException e) {
-//            // handle invalid year input
-//        }
-//        clearFields();
-    }
-
-    private void clearFields() {
-        plateTextField.clear();
-        makeTextField.clear();
-        modelTextField.clear();
-        yearTextField.clear();
-        rentalStartDatePicker.setValue(null);
+    public void handleRefreshButton(ActionEvent actionEvent) {
+        carTable.refresh();
+        jdbi.useHandle(handle -> {
+            List<Car> cars = handle.attach(CarDao.class).getCars();
+            carTable.setItems(carTable.getItems().filtered(cars::contains));
+            carTable.getItems().forEach(System.out::println);
+        });
     }
 }
 
