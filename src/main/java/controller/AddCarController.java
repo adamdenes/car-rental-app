@@ -21,8 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class AddCarController implements SceneSwitcher {
-
-    public Button cancelButton;
+    @FXML
+    private Button cancelButton;
     @FXML
     private Button saveButton;
     @FXML
@@ -96,12 +96,12 @@ public class AddCarController implements SceneSwitcher {
     }
 
     public void switchSceneTo(String path) throws IOException {
-        Logger.info("Switching scene to: " + path);
-                // switch back to `path` scene
+        // switch back to `path` scene
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
-        Stage stage = (Stage) saveButton.getScene().getWindow();
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();
+        Logger.info("Switching scene to: " + stage.getTitle());
     }
 
 }

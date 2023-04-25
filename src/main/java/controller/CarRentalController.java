@@ -25,6 +25,10 @@ import java.util.Optional;
 
 public class CarRentalController implements SceneSwitcher {
     @FXML
+    public Button returnButton;
+    @FXML
+    public TextField plateReturnField;
+    @FXML
     private Button addButton;
     @FXML
     public Button deleteButton;
@@ -76,8 +80,6 @@ public class CarRentalController implements SceneSwitcher {
 
         jdbi.useHandle(handle -> {
             List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
-            Logger.debug("Filling table with: ");
-            cars.forEach(Logger::debug);
             carTable.getItems().addAll(cars);
         });
     }
@@ -103,7 +105,7 @@ public class CarRentalController implements SceneSwitcher {
                 Optional<CarRentalModel> exists = cd.getCarByPlate(plateToDelete);
                 if (exists.isPresent()) {
                     cd.deleteCarByPlate(plateToDelete);
-                    Logger.debug("Row deleted from table.");
+                    Logger.debug("Row deleted from table");
                 } else {
                     Logger.error("There is no such car in the database");
                 }
@@ -148,8 +150,39 @@ public class CarRentalController implements SceneSwitcher {
                     Logger.debug("Car rented from " + startDate + ", state changed to RENTED");
                 }
             });
+            // might be overkill
+            handleRefreshButton(actionEvent);
+
             // dirty trick to refresh the scene, because
-            // the `updateCar` removed the table row...
+            // the `updateCar` removes the table row...
+            switchSceneTo("/fxml/carrental.fxml");
+        } else {
+            Logger.error("Invalid input");
+        }
+    }
+
+    @FXML
+    public void handleReturnButton(ActionEvent actionEvent) throws IOException {
+        String plateToReturn = plateReturnField.getText();
+
+        if (!plateToReturn.isEmpty()) {
+            jdbi.useHandle(handle -> {
+                CarDao cd = handle.attach(CarDao.class);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(plateToReturn);
+                if (exists.isPresent()) {
+                    exists.get().setState(State.AVAILABLE);
+                    exists.get().setRentalStartDate(null);
+                    cd.updateCar(exists.get());
+                    Logger.debug("Car has been successfully returned to the pool");
+                } else {
+                    Logger.error("There is no such car in the database");
+                }
+            });
+            // might be overkill
+            handleRefreshButton(actionEvent);
+
+            // dirty trick to refresh the scene, because
+            // the `updateCar` removes the table row...
             switchSceneTo("/fxml/carrental.fxml");
         } else {
             Logger.error("Invalid input");
@@ -163,12 +196,13 @@ public class CarRentalController implements SceneSwitcher {
     }
 
     public void switchSceneTo(String path) throws IOException {
-        Logger.info("Switching scene to: " + path);
         // switch back to `path` scene
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
-        Stage stage = (Stage) carTable.getScene().getWindow();
+        Stage stage = (Stage) addButton.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();
+        Logger.info("Switching scene to: " + stage.getTitle());
     }
+
 }
 
