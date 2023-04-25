@@ -12,7 +12,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.CarRentalModel;
 import model.CarRentalModel.State;
@@ -82,8 +81,6 @@ public class CarRentalController {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/addcar.fxml")));
         stage.setScene(new Scene(root));
         stage.setTitle("Add Car");
-        // can't close parent
-        stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
     }
 

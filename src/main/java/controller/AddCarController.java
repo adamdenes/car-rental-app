@@ -89,7 +89,7 @@ public class AddCarController {
     }
 
     private void switchSceneTo(String path) throws IOException {
-        // switch back to `carrental` scene
+        // switch back to `path` scene
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.setScene(new Scene(root));
