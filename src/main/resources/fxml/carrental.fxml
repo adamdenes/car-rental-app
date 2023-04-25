@@ -7,10 +7,12 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="504.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CarRentalController">
    <children>
-      <TableView fx:id="carTable" layoutX="40.0" layoutY="40.0" prefHeight="200.0" prefWidth="520.0">
+      <TableView fx:id="carTable" layoutX="40.0" layoutY="52.0" prefHeight="200.0" prefWidth="520.0">
         <columns>
             <TableColumn fx:id="plateColumn" prefWidth="89.0" text="plate" />
             <TableColumn fx:id="makeColumn" prefWidth="74.0" text="make" />
@@ -35,5 +37,10 @@
       <Button fx:id="returnButton" layoutX="40.0" layoutY="447.0" mnemonicParsing="false" onAction="#handleReturnButton" prefHeight="24.0" prefWidth="96.0" text="Return" />
       <Label layoutX="356.0" layoutY="447.0" prefHeight="24.0" prefWidth="162.0" text="Make car available" />
       <TextField fx:id="plateReturnField" layoutX="168.0" layoutY="447.0" prefHeight="24.0" prefWidth="144.0" promptText="Car Plate" />
+      <Text layoutX="210.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to Car Rental App" textAlignment="CENTER" wrappingWidth="180.7294921875">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>
