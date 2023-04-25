@@ -1,6 +1,7 @@
 package controller;
 
 import hu.inf.unideb.CarDao;
+import hu.inf.unideb.SceneSwitcher;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
-public class AddCarController {
+public class AddCarController implements SceneSwitcher {
 
     public Button cancelButton;
     @FXML
@@ -94,7 +95,7 @@ public class AddCarController {
         return car.getRentalStartDate() != null;
     }
 
-    private void switchSceneTo(String path) throws IOException {
+    public void switchSceneTo(String path) throws IOException {
         Logger.info("Switching scene to: " + path);
                 // switch back to `path` scene
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));

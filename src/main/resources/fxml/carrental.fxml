@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CarRentalController">
+<AnchorPane prefHeight="447.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CarRentalController">
    <children>
       <TableView fx:id="carTable" layoutX="40.0" layoutY="40.0" prefHeight="200.0" prefWidth="520.0">
         <columns>
@@ -26,5 +27,10 @@
       <Label layoutX="356.0" layoutY="264.0" prefHeight="24.0" prefWidth="162.0" text="Refresh table" />
       <Label layoutX="356.0" layoutY="301.0" prefHeight="24.0" prefWidth="162.0" text="Create or update car" />
       <Label layoutX="356.0" layoutY="337.0" prefHeight="24.0" prefWidth="162.0" text="Delete car with plate id" textFill="#d62020" />
+      <Button fx:id="rentButton" layoutX="40.0" layoutY="375.0" mnemonicParsing="false" onAction="#handleRentButton" prefHeight="24.0" prefWidth="96.0" text="RENT" />
+      <TextField fx:id="plateRentField" layoutX="168.0" layoutY="375.0" prefHeight="24.0" prefWidth="144.0" promptText="Car Plate" />
+      <DatePicker fx:id="datePickerField" layoutX="168.0" layoutY="409.0" prefHeight="24.0" prefWidth="144.0" />
+      <Label layoutX="356.0" layoutY="375.0" prefHeight="24.0" prefWidth="162.0" text="Select a car to rent" />
+      <Label layoutX="356.0" layoutY="409.0" prefHeight="24.0" prefWidth="162.0" text="Chose starting date" />
    </children>
 </AnchorPane>

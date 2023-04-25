@@ -1,16 +1,14 @@
 package controller;
 
 import hu.inf.unideb.CarDao;
+import hu.inf.unideb.SceneSwitcher;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.CarRentalModel;
@@ -23,15 +21,23 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-public class CarRentalController {
+public class CarRentalController implements SceneSwitcher {
+    @FXML
+    private Button addButton;
     @FXML
     public Button deleteButton;
     @FXML
     public Button refreshButton;
-
     @FXML
-    private Button addButton;
+    public Button rentButton;
+    @FXML
+    private TextField plateDeleteField;
+    @FXML
+    public TextField plateRentField;
+    @FXML
+    public DatePicker datePickerField;
     @FXML
     private TableView<CarRentalModel> carTable;
 
@@ -53,8 +59,6 @@ public class CarRentalController {
     @FXML
     private TableColumn<CarRentalModel, State> stateColumn;
 
-    @FXML
-    private TextField plateDeleteField;
     private static final String dbPath = "/home/adenes/projects/java/car-rental-app/carpool.db";
     public static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
 
@@ -92,22 +96,79 @@ public class CarRentalController {
     @FXML
     public void handleDeleteButton(ActionEvent actionEvent) {
         String plateToDelete = plateDeleteField.getText();
+
         if (!plateToDelete.isEmpty()) {
-            jdbi.useHandle(handle -> handle.attach(CarDao.class).deleteCarByPlate(plateToDelete));
+            jdbi.useHandle(handle -> {
+                CarDao cd = handle.attach(CarDao.class);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(plateToDelete);
+                if (exists.isPresent()) {
+                    cd.deleteCarByPlate(plateToDelete);
+                    Logger.debug("Row deleted from table.");
+                } else {
+                    Logger.error("There is no such car in the database");
+                }
+            });
             handleRefreshButton(actionEvent);
-            Logger.debug("Row deleted from table.");
+        } else {
+            Logger.error("Invalid input");
         }
-        Logger.error("Invalid input, `plate` is missing");
     }
 
     @FXML
     public void handleRefreshButton(ActionEvent actionEvent) {
+        clearFields();
         carTable.refresh();
         jdbi.useHandle(handle -> {
             List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
             carTable.setItems(carTable.getItems().filtered(cars::contains));
         });
         Logger.debug("Car table refreshed");
+    }
+
+    @FXML
+    public void handleRentButton(ActionEvent actionEvent) throws IOException {
+        String plate = plateRentField.getText();
+        LocalDate startDate = datePickerField.getValue();
+
+        if (!plate.isEmpty() && startDate != null) {
+            jdbi.useHandle(handle -> {
+                CarDao cd = handle.attach(CarDao.class);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(plate);
+
+                if (exists.isEmpty()) {
+                    Logger.error("Car doesn't exist with plate: " + plate);
+                } else if (exists.get().getRentalStartDate() != null) {
+                    Logger.error("Car already rented since: " + exists.get().getRentalStartDate());
+                } else {
+                    CarRentalModel car = exists.get();
+                    car.setState(State.RENTED);
+                    car.setRentalStartDate(startDate);
+
+                    cd.updateCar(car);
+                    Logger.debug("Car rented from " + startDate + ", state changed to RENTED");
+                }
+            });
+            // dirty trick to refresh the scene, because
+            // the `updateCar` removed the table row...
+            switchSceneTo("/fxml/carrental.fxml");
+        } else {
+            Logger.error("Invalid input");
+        }
+    }
+
+    public void clearFields() {
+        plateRentField.setText("");
+        datePickerField.setValue(null);
+        plateDeleteField.setText("");
+    }
+
+    public void switchSceneTo(String path) throws IOException {
+        Logger.info("Switching scene to: " + path);
+        // switch back to `path` scene
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
+        Stage stage = (Stage) carTable.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 }
 
