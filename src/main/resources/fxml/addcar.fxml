@@ -21,6 +21,7 @@
       <TextField fx:id="modelField" layoutX="85.0" layoutY="132.0" prefHeight="24.0" prefWidth="198.0" />
       <TextField fx:id="yearField" layoutX="85.0" layoutY="182.0" prefHeight="24.0" prefWidth="198.0" />
       <RadioButton fx:id="availableRadioButton" layoutX="85.0" layoutY="274.0" mnemonicParsing="false" text="AVAILABLE" />
-      <Button fx:id="saveButton" layoutX="70.0" layoutY="339.0" mnemonicParsing="false" onAction="#handleSaveButton" text="Save" />
+      <Button fx:id="saveButton" layoutX="33.0" layoutY="339.0" mnemonicParsing="false" onAction="#handleSaveButton" text="Save" />
+      <Button fx:id="cancelButton" layoutX="108.0" layoutY="339.0" mnemonicParsing="false" onAction="#handleCancelButton" text="Cancel" />
    </children>
 </AnchorPane>

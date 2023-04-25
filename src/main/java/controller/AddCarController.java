@@ -1,6 +1,7 @@
 package controller;
 
 import hu.inf.unideb.CarDao;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 public class AddCarController {
 
+    public Button cancelButton;
     @FXML
     private Button saveButton;
     @FXML
@@ -74,15 +76,24 @@ public class AddCarController {
             }
         });
 
-        // switch back to `carrental` scene
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/carrental.fxml")));
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.show();
+        switchSceneTo("/fxml/carrental.fxml");
+    }
+
+    @FXML
+    public void handleCancelButton(ActionEvent actionEvent) throws IOException {
+        switchSceneTo("/fxml/carrental.fxml");
     }
 
     private boolean isRented(CarRentalModel car) {
         return car.getRentalStartDate() != null;
+    }
+
+    private void switchSceneTo(String path) throws IOException {
+        // switch back to `carrental` scene
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
+        Stage stage = (Stage) saveButton.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
 }
