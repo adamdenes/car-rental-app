@@ -45,42 +45,54 @@ public class AddCarController implements SceneSwitcher {
 
     @FXML
     private void handleSaveButton() throws IOException {
-        String plate = plateField.getText();
-        String make = makeField.getText();
-        String model = modelField.getText();
-        int year = Integer.parseInt(yearField.getText());
-        LocalDate rentalStartDate = datePicker.getValue();
-        CarRentalModel.State state = availableRadioButton.isSelected() ? CarRentalModel.State.AVAILABLE : CarRentalModel.State.RENTED;
 
-        CarRentalModel car = new CarRentalModel(plate, make, model, year, rentalStartDate, state);
+        try {
+            String plate = plateField.getText();
 
-        if (isRented(car)) {
-            car.setState(CarRentalModel.State.RENTED);
-            Logger.debug("Setting `Car.State` to RENTED");
-        } else {
-            car.setState(CarRentalModel.State.AVAILABLE);
-            Logger.debug("Setting `Car.State` to AVAILABLE");
-        }
-
-        CarRentalController.jdbi.useHandle(handle -> {
-            CarDao cd = handle.attach(CarDao.class);
-            Optional<CarRentalModel> exists = cd.getCarByPlate(car.getPlate());
-            if (exists.isEmpty()) {
-                // create a new car record
-                cd.insertCar(car);
-                Logger.debug("Creating new car: " + car);
-            } else {
-                // update the record
-                exists.get().setMake(make);
-                exists.get().setModel(model);
-                exists.get().setYear(year);
-                exists.get().setRentalStartDate(rentalStartDate);
-                exists.get().setState(car.getState());
-
-                cd.updateCar(exists.get());
-                Logger.debug("Updating car: " + exists.get());
+            if (plate.isEmpty()) {
+                CarRentalController.sendAlert("Invalid input", "Please enter the plate number to add/update a car!");
+                return;
             }
-        });
+
+            String make = makeField.getText();
+            String model = modelField.getText();
+            int year = Integer.parseInt(yearField.getText());
+            LocalDate rentalStartDate = datePicker.getValue();
+            CarRentalModel.State state = availableRadioButton.isSelected() ? CarRentalModel.State.AVAILABLE : CarRentalModel.State.RENTED;
+
+            CarRentalModel car = new CarRentalModel(plate, make, model, year, rentalStartDate, state);
+
+            if (isRented(car)) {
+                car.setState(CarRentalModel.State.RENTED);
+                Logger.debug("Setting `Car.State` to RENTED");
+            } else {
+                car.setState(CarRentalModel.State.AVAILABLE);
+                Logger.debug("Setting `Car.State` to AVAILABLE");
+            }
+
+            CarRentalController.jdbi.useHandle(handle -> {
+                CarDao cd = handle.attach(CarDao.class);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(car.getPlate());
+                if (exists.isEmpty()) {
+                    // create a new car record
+                    cd.insertCar(car);
+                    Logger.debug("Creating new car: " + car);
+                } else {
+                    // update the record
+                    exists.get().setMake(make);
+                    exists.get().setModel(model);
+                    exists.get().setYear(year);
+                    exists.get().setRentalStartDate(rentalStartDate);
+                    exists.get().setState(car.getState());
+
+                    cd.updateCar(exists.get());
+                    Logger.debug("Updating car: " + exists.get());
+                }
+            });
+        } catch (NumberFormatException e) {
+            CarRentalController.sendAlert("Invalid input", "Please fill out the year field (YYYY)!");
+            return;
+        }
 
         switchSceneTo("/fxml/carrental.fxml");
     }
