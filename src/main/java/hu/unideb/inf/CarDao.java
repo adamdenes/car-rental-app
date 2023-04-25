@@ -9,7 +9,6 @@ import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +28,6 @@ public interface CarDao {
 
     @SqlQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=:tableName")
     boolean checkTableExists(@Bind("tableName") String tableName);
-
-    @SqlUpdate("INSERT INTO <tableName> VALUES (:plate, :make, :model, :year, :rentalStartDate, :state)")
-    void insertCar(@Define("tableName") String tableName,
-                   @Bind("plate") String plate,
-                   @Bind("make") String make,
-                   @Bind("model") String model,
-                   @Bind("year") int year,
-                   @Bind("rentalStartDate") LocalDate rentalStartDate,
-                   @Bind("state") CarRentalModel.State state);
 
     @SqlUpdate("INSERT INTO <tableName> VALUES (:plate, :make, :model, :year, :rentalStartDate, :state)")
     void insertCar(@Define("tableName") String tableName, @BindBean CarRentalModel car);
