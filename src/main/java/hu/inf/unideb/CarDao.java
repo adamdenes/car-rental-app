@@ -1,7 +1,7 @@
 package hu.inf.unideb;
 
 
-import model.Car;
+import model.CarRentalModel;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@RegisterBeanMapper(Car.class)
+@RegisterBeanMapper(CarRentalModel.class)
 public interface CarDao {
     @SqlUpdate("""
             CREATE TABLE carpool (
@@ -39,25 +39,25 @@ public interface CarDao {
                    @Bind("model") String model,
                    @Bind("year") int year,
                    @Bind("rentalStartDate") LocalDate rentalStartDate,
-                   @Bind("state") Car.State state);
+                   @Bind("state") CarRentalModel.State state);
 
     @SqlUpdate("INSERT INTO carpool VALUES (:plate, :make, :model, :year, :rentalStartDate, :state)")
-    void insertCar(@BindBean Car car);
+    void insertCar(@BindBean CarRentalModel car);
 
     @SqlQuery("SELECT * FROM carpool WHERE plate = :plate")
-    Optional<Car> getCarByPlate(@Bind("plate") String plate);
+    Optional<CarRentalModel> getCarByPlate(@Bind("plate") String plate);
 
     @SqlQuery("SELECT * FROM carpool ORDER BY plate")
-    List<Car> getCars();
+    List<CarRentalModel> getCars();
 
     @SqlUpdate("DELETE FROM carpool")
     void deleteAllCars();
 
     @SqlUpdate("DELETE FROM carpool WHERE plate = :plate")
-    int deleteCarByPlate(@Bind("plate") String plate);
+    void deleteCarByPlate(@Bind("plate") String plate);
 
 
     @SqlUpdate("UPDATE carpool SET make = :make, model = :model, year = :year, " +
             "rentalStartDate = :rentalStartDate, state = :state WHERE plate = :plate")
-    void updateCar(@BindBean Car car);
+    void updateCar(@BindBean CarRentalModel car);
 }

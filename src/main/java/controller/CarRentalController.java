@@ -14,8 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.Car;
-import model.Car.State;
+import model.CarRentalModel;
+import model.CarRentalModel.State;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
@@ -26,28 +26,32 @@ import java.util.Objects;
 
 public class CarRentalController {
     @FXML
-    private TableView<Car> carTable;
-
+    public Button deleteButton;
     @FXML
-    private TableColumn<Car, String> plateColumn;
-
-    @FXML
-    private TableColumn<Car, String> makeColumn;
-
-    @FXML
-    private TableColumn<Car, String> modelColumn;
-
-    @FXML
-    private TableColumn<Car, Integer> yearColumn;
-
-    @FXML
-    private TableColumn<Car, LocalDate> rentalStartDateColumn;
-
-    @FXML
-    private TableColumn<Car, State> stateColumn;
+    public Button refreshButton;
 
     @FXML
     private Button addButton;
+    @FXML
+    private TableView<CarRentalModel> carTable;
+
+    @FXML
+    private TableColumn<CarRentalModel, String> plateColumn;
+
+    @FXML
+    private TableColumn<CarRentalModel, String> makeColumn;
+
+    @FXML
+    private TableColumn<CarRentalModel, String> modelColumn;
+
+    @FXML
+    private TableColumn<CarRentalModel, Integer> yearColumn;
+
+    @FXML
+    private TableColumn<CarRentalModel, LocalDate> rentalStartDateColumn;
+
+    @FXML
+    private TableColumn<CarRentalModel, State> stateColumn;
 
     @FXML
     private TextField plateDeleteField;
@@ -66,7 +70,7 @@ public class CarRentalController {
         CarRentalController.jdbi.installPlugin(new SqlObjectPlugin());
 
         jdbi.useHandle(handle -> {
-            List<Car> cars = handle.attach(CarDao.class).getCars();
+            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
             carTable.getItems().addAll(cars);
         });
     }
@@ -87,9 +91,7 @@ public class CarRentalController {
     public void handleDeleteButton(ActionEvent actionEvent) {
         String plateToDelete = plateDeleteField.getText();
         if (!plateToDelete.isEmpty()) {
-            jdbi.useHandle(handle -> {
-                handle.attach(CarDao.class).deleteCarByPlate(plateToDelete);
-            });
+            jdbi.useHandle(handle -> handle.attach(CarDao.class).deleteCarByPlate(plateToDelete));
             handleRefreshButton(actionEvent);
         }
     }
@@ -98,7 +100,7 @@ public class CarRentalController {
     public void handleRefreshButton(ActionEvent actionEvent) {
         carTable.refresh();
         jdbi.useHandle(handle -> {
-            List<Car> cars = handle.attach(CarDao.class).getCars();
+            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
             carTable.setItems(carTable.getItems().filtered(cars::contains));
             carTable.getItems().forEach(System.out::println);
         });

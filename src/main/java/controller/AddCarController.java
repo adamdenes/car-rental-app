@@ -3,18 +3,14 @@ package controller;
 import hu.inf.unideb.CarDao;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.Car;
-import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import model.CarRentalModel;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -50,19 +46,19 @@ public class AddCarController {
         String model = modelField.getText();
         int year = Integer.parseInt(yearField.getText());
         LocalDate rentalStartDate = datePicker.getValue();
-        Car.State state = availableRadioButton.isSelected() ? Car.State.AVAILABLE : Car.State.RENTED;
+        CarRentalModel.State state = availableRadioButton.isSelected() ? CarRentalModel.State.AVAILABLE : CarRentalModel.State.RENTED;
 
-        Car car = new Car(plate, make, model, year, rentalStartDate, state);
+        CarRentalModel car = new CarRentalModel(plate, make, model, year, rentalStartDate, state);
 
         if (isRented(car)) {
-            car.setState(Car.State.RENTED);
+            car.setState(CarRentalModel.State.RENTED);
         } else {
-            car.setState(Car.State.AVAILABLE);
+            car.setState(CarRentalModel.State.AVAILABLE);
         }
 
         CarRentalController.jdbi.useHandle(handle -> {
             CarDao cd = handle.attach(CarDao.class);
-            Optional<Car> exists = cd.getCarByPlate(car.getPlate());
+            Optional<CarRentalModel> exists = cd.getCarByPlate(car.getPlate());
             if (exists.isEmpty()) {
                 // create a new car record
                 cd.insertCar(car);
@@ -85,7 +81,7 @@ public class AddCarController {
         stage.show();
     }
 
-    private boolean isRented(Car car) {
+    private boolean isRented(CarRentalModel car) {
         return car.getRentalStartDate() != null;
     }
 
