@@ -1,7 +1,8 @@
 package controller;
 
-import hu.inf.unideb.CarDao;
-import hu.inf.unideb.SceneSwitcher;
+
+import hu.unideb.inf.CarDao;
+import hu.unideb.inf.SceneSwitcher;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -79,7 +80,7 @@ public class CarRentalController implements SceneSwitcher {
         CarRentalController.jdbi.installPlugin(new SqlObjectPlugin());
 
         jdbi.useHandle(handle -> {
-            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
+            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars(CarRentalModel.carpool);
             carTable.getItems().addAll(cars);
         });
     }
@@ -102,9 +103,9 @@ public class CarRentalController implements SceneSwitcher {
         if (!plateToDelete.isEmpty()) {
             jdbi.useHandle(handle -> {
                 CarDao cd = handle.attach(CarDao.class);
-                Optional<CarRentalModel> exists = cd.getCarByPlate(plateToDelete);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(CarRentalModel.carpool, plateToDelete);
                 if (exists.isPresent()) {
-                    cd.deleteCarByPlate(plateToDelete);
+                    cd.deleteCarByPlate(CarRentalModel.carpool, plateToDelete);
                     Logger.debug("Row deleted from table");
                 } else {
                     sendAlert("Delete error", "There is no such car in the database!");
@@ -123,7 +124,7 @@ public class CarRentalController implements SceneSwitcher {
         clearFields();
         carTable.refresh();
         jdbi.useHandle(handle -> {
-            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
+            List<CarRentalModel> cars = handle.attach(CarDao.class).getCars(CarRentalModel.carpool);
             carTable.setItems(carTable.getItems().filtered(cars::contains));
         });
         Logger.debug("Car table refreshed");
@@ -137,7 +138,7 @@ public class CarRentalController implements SceneSwitcher {
         if (!plate.isEmpty() && startDate != null) {
             jdbi.useHandle(handle -> {
                 CarDao cd = handle.attach(CarDao.class);
-                Optional<CarRentalModel> exists = cd.getCarByPlate(plate);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(CarRentalModel.carpool, plate);
 
                 if (exists.isEmpty()) {
                     sendAlert("Renting error", "There is no such car in the database!");
@@ -150,7 +151,7 @@ public class CarRentalController implements SceneSwitcher {
                     car.setState(State.RENTED);
                     car.setRentalStartDate(startDate);
 
-                    cd.updateCar(car);
+                    cd.updateCar(CarRentalModel.carpool, car);
                     Logger.debug("Car rented from " + startDate + ", state changed to RENTED");
                 }
             });
@@ -173,11 +174,11 @@ public class CarRentalController implements SceneSwitcher {
         if (!plateToReturn.isEmpty()) {
             jdbi.useHandle(handle -> {
                 CarDao cd = handle.attach(CarDao.class);
-                Optional<CarRentalModel> exists = cd.getCarByPlate(plateToReturn);
+                Optional<CarRentalModel> exists = cd.getCarByPlate(CarRentalModel.carpool, plateToReturn);
                 if (exists.isPresent()) {
                     exists.get().setState(State.AVAILABLE);
                     exists.get().setRentalStartDate(null);
-                    cd.updateCar(exists.get());
+                    cd.updateCar(CarRentalModel.carpool, exists.get());
                     Logger.debug("Car has been successfully returned to the pool");
                 } else {
                     sendAlert("Return error", "There is no such car in the database!");

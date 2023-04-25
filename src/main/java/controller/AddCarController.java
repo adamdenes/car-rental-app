@@ -1,7 +1,7 @@
 package controller;
 
-import hu.inf.unideb.CarDao;
-import hu.inf.unideb.SceneSwitcher;
+import hu.unideb.inf.CarDao;
+import hu.unideb.inf.SceneSwitcher;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -72,10 +72,10 @@ public class AddCarController implements SceneSwitcher {
 
             CarRentalController.jdbi.useHandle(handle -> {
                 CarDao cd = handle.attach(CarDao.class);
-                Optional<CarRentalModel> exists = cd.getCarByPlate(car.getPlate());
+                Optional<CarRentalModel> exists = cd.getCarByPlate(CarRentalModel.carpool, car.getPlate());
                 if (exists.isEmpty()) {
                     // create a new car record
-                    cd.insertCar(car);
+                    cd.insertCar(CarRentalModel.carpool, car);
                     Logger.debug("Creating new car: " + car);
                 } else {
                     // update the record
@@ -85,7 +85,7 @@ public class AddCarController implements SceneSwitcher {
                     exists.get().setRentalStartDate(rentalStartDate);
                     exists.get().setState(car.getState());
 
-                    cd.updateCar(exists.get());
+                    cd.updateCar(CarRentalModel.carpool, exists.get());
                     Logger.debug("Updating car: " + exists.get());
                 }
             });
