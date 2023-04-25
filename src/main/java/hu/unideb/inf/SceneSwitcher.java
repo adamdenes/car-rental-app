@@ -1,4 +1,4 @@
-package hu.inf.unideb;
+package hu.unideb.inf;
 
 import java.io.IOException;
 

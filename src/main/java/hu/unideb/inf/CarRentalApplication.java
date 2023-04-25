@@ -1,4 +1,4 @@
-package hu.inf.unideb;
+package hu.unideb.inf;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
