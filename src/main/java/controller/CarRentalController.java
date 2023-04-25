@@ -17,6 +17,7 @@ import model.CarRentalModel;
 import model.CarRentalModel.State;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -59,6 +60,7 @@ public class CarRentalController {
 
     @FXML
     private void initialize() {
+        Logger.info("Initializing CarRentalController");
         plateColumn.setCellValueFactory(new PropertyValueFactory<>("plate"));
         makeColumn.setCellValueFactory(new PropertyValueFactory<>("make"));
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
@@ -70,6 +72,8 @@ public class CarRentalController {
 
         jdbi.useHandle(handle -> {
             List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
+            Logger.debug("Filling table with: ");
+            cars.forEach(Logger::debug);
             carTable.getItems().addAll(cars);
         });
     }
@@ -77,6 +81,7 @@ public class CarRentalController {
 
     @FXML
     private void handleAddButton(ActionEvent actionEvent) throws IOException {
+        Logger.info("Opening `Add Car` window");
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/addcar.fxml")));
         stage.setScene(new Scene(root));
@@ -90,7 +95,9 @@ public class CarRentalController {
         if (!plateToDelete.isEmpty()) {
             jdbi.useHandle(handle -> handle.attach(CarDao.class).deleteCarByPlate(plateToDelete));
             handleRefreshButton(actionEvent);
+            Logger.debug("Row deleted from table.");
         }
+        Logger.error("Invalid input, `plate` is missing");
     }
 
     @FXML
@@ -99,8 +106,8 @@ public class CarRentalController {
         jdbi.useHandle(handle -> {
             List<CarRentalModel> cars = handle.attach(CarDao.class).getCars();
             carTable.setItems(carTable.getItems().filtered(cars::contains));
-            carTable.getItems().forEach(System.out::println);
         });
+        Logger.debug("Car table refreshed");
     }
 }
 

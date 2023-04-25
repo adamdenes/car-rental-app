@@ -12,6 +12,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.CarRentalModel;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -54,8 +55,10 @@ public class AddCarController {
 
         if (isRented(car)) {
             car.setState(CarRentalModel.State.RENTED);
+            Logger.debug("Setting `Car.State` to RENTED");
         } else {
             car.setState(CarRentalModel.State.AVAILABLE);
+            Logger.debug("Setting `Car.State` to AVAILABLE");
         }
 
         CarRentalController.jdbi.useHandle(handle -> {
@@ -64,6 +67,7 @@ public class AddCarController {
             if (exists.isEmpty()) {
                 // create a new car record
                 cd.insertCar(car);
+                Logger.debug("Creating new car: " + car);
             } else {
                 // update the record
                 exists.get().setMake(make);
@@ -73,6 +77,7 @@ public class AddCarController {
                 exists.get().setState(car.getState());
 
                 cd.updateCar(exists.get());
+                Logger.debug("Updating car: " + exists.get());
             }
         });
 
@@ -81,6 +86,7 @@ public class AddCarController {
 
     @FXML
     public void handleCancelButton(ActionEvent actionEvent) throws IOException {
+        Logger.info("Add/Update operation aborted");
         switchSceneTo("/fxml/carrental.fxml");
     }
 
@@ -89,7 +95,8 @@ public class AddCarController {
     }
 
     private void switchSceneTo(String path) throws IOException {
-        // switch back to `path` scene
+        Logger.info("Switching scene to: " + path);
+                // switch back to `path` scene
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(path)));
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.setScene(new Scene(root));
