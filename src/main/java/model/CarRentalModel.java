@@ -17,6 +17,8 @@ public class CarRentalModel {
         AVAILABLE
     }
 
+    public static final String carpool = "carpool";
+
     private String plate;
     private String make;
     private String model;
