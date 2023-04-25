@@ -107,11 +107,13 @@ public class CarRentalController implements SceneSwitcher {
                     cd.deleteCarByPlate(plateToDelete);
                     Logger.debug("Row deleted from table");
                 } else {
+                    sendAlert("Delete error", "There is no such car in the database!");
                     Logger.error("There is no such car in the database");
                 }
             });
             handleRefreshButton(actionEvent);
         } else {
+            sendAlert("Delete error", "Please enter a plate number to delete!");
             Logger.error("Invalid input");
         }
     }
@@ -138,8 +140,10 @@ public class CarRentalController implements SceneSwitcher {
                 Optional<CarRentalModel> exists = cd.getCarByPlate(plate);
 
                 if (exists.isEmpty()) {
+                    sendAlert("Renting error", "There is no such car in the database!");
                     Logger.error("Car doesn't exist with plate: " + plate);
                 } else if (exists.get().getRentalStartDate() != null) {
+                    sendAlert("Renting error", "This car is not available for renting at the moment!");
                     Logger.error("Car already rented since: " + exists.get().getRentalStartDate());
                 } else {
                     CarRentalModel car = exists.get();
@@ -157,6 +161,7 @@ public class CarRentalController implements SceneSwitcher {
             // the `updateCar` removes the table row...
             switchSceneTo("/fxml/carrental.fxml");
         } else {
+            sendAlert("Renting error", "Please enter the plate number and chose a suitable start date!");
             Logger.error("Invalid input");
         }
     }
@@ -175,6 +180,7 @@ public class CarRentalController implements SceneSwitcher {
                     cd.updateCar(exists.get());
                     Logger.debug("Car has been successfully returned to the pool");
                 } else {
+                    sendAlert("Return error", "There is no such car in the database!");
                     Logger.error("There is no such car in the database");
                 }
             });
@@ -185,6 +191,7 @@ public class CarRentalController implements SceneSwitcher {
             // the `updateCar` removes the table row...
             switchSceneTo("/fxml/carrental.fxml");
         } else {
+            sendAlert("Return error", "Please enter a plate number to return a car to the pool!");
             Logger.error("Invalid input");
         }
     }
@@ -202,6 +209,15 @@ public class CarRentalController implements SceneSwitcher {
         stage.setScene(new Scene(root));
         stage.show();
         Logger.info("Switching scene to: " + stage.getTitle());
+    }
+
+    public static void sendAlert(String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        alert.showAndWait();
     }
 
 }
