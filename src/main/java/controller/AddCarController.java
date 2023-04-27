@@ -98,7 +98,7 @@ public class AddCarController implements SceneSwitcher {
     }
 
     @FXML
-    public void handleCancelButton(ActionEvent actionEvent) throws IOException {
+    public void handleCancelButton(ActionEvent ignoredActionEvent) throws IOException {
         Logger.info("Add/Update operation aborted");
         switchSceneTo("/fxml/carrental.fxml");
     }
