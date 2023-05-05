@@ -64,8 +64,7 @@ public class CarRentalController implements SceneSwitcher {
     @FXML
     private TableColumn<CarRentalModel, State> stateColumn;
 
-    private static final String dbPath = "/home/adenes/projects/java/car-rental-app/carpool.db";
-    public static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:" + dbPath);
+    public static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:carpool.db");
 
     @FXML
     private void initialize() {
