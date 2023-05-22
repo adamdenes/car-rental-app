@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static controller.CarRentalController.jdbi;
+import static model.CarRentalModel.jdbi;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CarDaoTest {
