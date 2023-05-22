@@ -1,7 +1,6 @@
 package model;
 
-import controller.CarRentalController;
-import hu.unideb.inf.CarDao;
+    import hu.unideb.inf.CarDao;
 import hu.unideb.inf.CarRentalException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
