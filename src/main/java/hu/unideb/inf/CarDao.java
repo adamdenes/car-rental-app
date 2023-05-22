@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RegisterBeanMapper(CarRentalModel.class)
 public interface CarDao {
+
     @SqlUpdate("CREATE TABLE IF NOT EXISTS <tableName> ("
             + "plate VARCHAR PRIMARY KEY, "
             + "make VARCHAR NOT NULL, "
@@ -48,4 +49,5 @@ public interface CarDao {
     @SqlUpdate("UPDATE <tableName> SET make = :make, model = :model, year = :year, "
             + "rentalStartDate = :rentalStartDate, state = :state WHERE plate = :plate")
     void updateCar(@Define("tableName") String tableName, @BindBean CarRentalModel car);
+
 }

@@ -14,7 +14,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.CarRentalModel;
 import model.CarRentalModel.State;
-import org.jdbi.v3.core.Jdbi;
 import org.tinylog.Logger;
 
 import java.io.IOException;
@@ -61,8 +60,6 @@ public class CarRentalController implements SceneSwitcher {
 
     @FXML
     private TableColumn<CarRentalModel, State> stateColumn;
-
-    public static final Jdbi jdbi = Jdbi.create("jdbc:sqlite:carpool.db");
 
     @FXML
     private void initialize() {

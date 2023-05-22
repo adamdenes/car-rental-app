@@ -1,6 +1,6 @@
 package model;
 
-    import hu.unideb.inf.CarDao;
+import hu.unideb.inf.CarDao;
 import hu.unideb.inf.CarRentalException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -115,4 +115,5 @@ public class CarRentalModel {
             }
         });
     }
+
 }
