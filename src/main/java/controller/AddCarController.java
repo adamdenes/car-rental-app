@@ -1,6 +1,5 @@
 package controller;
 
-import hu.unideb.inf.CarDao;
 import hu.unideb.inf.SceneSwitcher;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +17,6 @@ import org.tinylog.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 
 public class AddCarController implements SceneSwitcher {
     @FXML
@@ -70,25 +68,8 @@ public class AddCarController implements SceneSwitcher {
                 Logger.debug("Setting `Car.State` to AVAILABLE");
             }
 
-            CarRentalController.jdbi.useHandle(handle -> {
-                CarDao cd = handle.attach(CarDao.class);
-                Optional<CarRentalModel> exists = cd.getCarByPlate(CarRentalModel.carpool, car.getPlate());
-                if (exists.isEmpty()) {
-                    // create a new car record
-                    cd.insertCar(CarRentalModel.carpool, car);
-                    Logger.debug("Creating new car: " + car);
-                } else {
-                    // update the record
-                    exists.get().setMake(make);
-                    exists.get().setModel(model);
-                    exists.get().setYear(year);
-                    exists.get().setRentalStartDate(rentalStartDate);
-                    exists.get().setState(car.getState());
+            CarRentalModel.addOrUpdateCar(car);
 
-                    cd.updateCar(CarRentalModel.carpool, exists.get());
-                    Logger.debug("Updating car: " + exists.get());
-                }
-            });
         } catch (NumberFormatException e) {
             CarRentalController.sendAlert("Invalid input", "Please fill out the year field (YYYY)!");
             return;
